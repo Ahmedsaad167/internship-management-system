@@ -95,6 +95,18 @@ CREATE TABLE "teacher_internships" (
     FOREIGN KEY("internship_id") REFERENCES "internships"("id")
 );
 
+CREATE TABLE "audit_log" (
+    "id" INTEGER PRIMARY KEY,
+    "grade_id" INTEGER NOT NULL,
+    "action" TEXT NOT NULL CHECK("action" IN ('insert', 'delete', 'update')),
+    "action_date" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "student_id" INTEGER NOT NULL,
+    "teacher_id" INTEGER NOT NULL,
+    FOREIGN KEY("grade_id") REFERENCES "grades"("id"),
+    FOREIGN KEY("student_id") REFERENCES "students"("id"),
+    FOREIGN KEY("teacher_id") REFERENCES "teachers"("id")
+);
+
 -- grades table
 CREATE TABLE "grades" (
     "id" INTEGER PRIMARY KEY,
@@ -151,3 +163,30 @@ FROM "grades"
 JOIN "students" ON "students"."id" = "grades"."student_id"
 JOIN "internships" ON "internships"."id" = "grades"."internship_id"
 JOIN "teachers" ON "teachers"."id" = "grades"."teacher_id";
+
+-- Audit Log insert triggers
+CREATE TRIGGER "log_grade_insert"
+AFTER INSERT ON "grades"
+FOR EACH ROW
+BEGIN
+    INSERT INTO "audit_log" ("grade_id", "action", "student_id", "teacher_id")
+    VALUES (NEW."id", 'insert', NEW."student_id", NEW."teacher_id");
+END;
+
+-- Audit Log Delete Trigger
+CREATE TRIGGER "log_grade_delete"
+BEFORE DELETE ON "grades"
+FOR EACH ROW
+BEGIN
+    INSERT INTO "audit_log" ("grade_id", "action", "student_id", "teacher_id")
+    VALUES (OLD."id", 'delete', OLD."student_id", OLD."teacher_id");
+END;
+
+-- Audit Log UPDATE Trigger
+CREATE TRIGGER "log_grade_update"
+AFTER UPDATE ON "grades"
+FOR EACH ROW
+BEGIN
+    INSERT INTO "audit_log" ("grade_id", "action", "student_id", "teacher_id")
+    VALUES (NEW."id", 'update', NEW."student_id", NEW."teacher_id");
+END;
