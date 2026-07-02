@@ -87,11 +87,21 @@ WHERE "id" = 7;
 -- University Coordinators
 -- =========================
 
--- Assign teachers to an internship
-
 -- View all internships
+SELECT "internships"."id", "internships"."title", "internships"."type", "internships"."location",
+       "companies"."title" AS "company", 
+       "company_supervisors"."first_name" || ' ' || "company_supervisors"."last_name" AS "company_supervisor",
+       "university_coordinators"."first_name" || ' ' || "university_coordinators"."last_name" AS "university_coordinator",
+       "internships"."start_date", "internships"."total_hours"
+FROM "internships"
+JOIN "companies" ON "companies"."id" = "internships"."company_id"
+JOIN "company_supervisors" ON "company_supervisors"."id" = "internships"."company_supervisor_id"
+JOIN "university_coordinators" ON "university_coordinators"."id" = "internships"."university_coordinator_id"
+ORDER BY "start_date" DESC;
 
 -- View all companies
+SELECT "id", "title", "specialization", "email", "location"
+FROM "companies";
 
 
 -- =========================
