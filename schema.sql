@@ -1,1 +1,111 @@
--- In this SQL file, write (and comment!) the schema of your database, including the CREATE TABLE, CREATE INDEX, CREATE VIEW, etc. statements that compose it
+    PRAGMA foreign_keys = ON;
+
+    -- students table
+    CREATE TABLE "students" (
+        "id" INTEGER PRIMARY KEY,
+        "first_name" TEXT NOT NULL,
+        "last_name" TEXT NOT NULL,
+        "phone_number" TEXT NOT NULL UNIQUE,
+        "college" TEXT NOT NULL,
+        "stage" INTEGER NOT NULL CHECK("stage" > 0 AND "stage" <= 7),
+        "university_id" INTEGER NOT NULL UNIQUE
+    );
+
+    -- teachers table
+    CREATE TABLE "teachers" (
+        "id" INTEGER PRIMARY KEY,
+        "first_name" TEXT NOT NULL,
+        "last_name" TEXT NOT NULL,
+        "national_id" TEXT NOT NULL UNIQUE,
+        "phone_number" TEXT NOT NULL UNIQUE,
+        "email" TEXT NOT NULL UNIQUE CHECK("email" LIKE '%@%'),
+        "general_specialization" TEXT NOT NULL,
+        "fine_specialization" TEXT NOT NULL,
+        "birth_date" TEXT NOT NULL CHECK("birth_date" > '1920-01-01' AND "birth_date" < CURRENT_DATE AND "birth_date" LIKE '____-__-__')
+    );
+
+    -- companies table
+    CREATE TABLE "companies" (
+        "id" INTEGER PRIMARY KEY,
+        "title" TEXT NOT NULL,
+        "specialization" TEXT,
+        "email" TEXT NOT NULL UNIQUE CHECK("email" LIKE '%@%'),
+        "location" TEXT NOT NULL
+    );
+
+    -- company_supervisors table
+    CREATE TABLE "company_supervisors" (
+        "id" INTEGER PRIMARY KEY,
+        "first_name" TEXT NOT NULL,
+        "last_name" TEXT NOT NULL,
+        "company_id" INTEGER NOT NULL,
+        "national_id" TEXT NOT NULL UNIQUE,
+        "phone_number" TEXT NOT NULL UNIQUE,
+        "email" TEXT NOT NULL UNIQUE CHECK("email" LIKE '%@%'),
+        "department" TEXT NOT NULL,
+        "role_title" TEXT NOT NULL,
+        "birth_date" TEXT NOT NULL CHECK("birth_date" > '1920-01-01' AND "birth_date" < CURRENT_DATE AND "birth_date" LIKE '____-__-__'),
+        FOREIGN KEY("company_id") REFERENCES "companies"("id") 
+    );
+
+    -- university_coordinators table
+    CREATE TABLE "university_coordinators" (
+        "id" INTEGER PRIMARY KEY,
+        "first_name" TEXT NOT NULL,
+        "last_name" TEXT NOT NULL,
+        "national_id" TEXT NOT NULL UNIQUE,
+        "phone_number" TEXT NOT NULL UNIQUE,
+        "email" TEXT NOT NULL UNIQUE CHECK("email" LIKE '%@%'),
+        "department" TEXT NOT NULL,
+        "coordinator_role" TEXT NOT NULL,
+        "birth_date" TEXT NOT NULL CHECK("birth_date" > '1920-01-01' AND "birth_date" < CURRENT_DATE AND "birth_date" LIKE '____-__-__')
+    );
+
+    -- internships table
+    CREATE TABLE "internships" (
+        "id" INTEGER PRIMARY KEY,
+        "title" TEXT NOT NULL,
+        "type" TEXT NOT NULL,
+        "location" TEXT NOT NULL CHECK("location" IN ('Remote', 'Hybrid', 'Onsite')),
+        "company_id" INTEGER NOT NULL,
+        "company_supervisor_id" INTEGER NOT NULL,
+        "university_coordinator_id" INTEGER NOT NULL,
+        "start_date" TEXT NOT NULL CHECK("start_date" LIKE '____-__-__'),
+        "total_hours" INTEGER NOT NULL CHECK("total_hours" > 0),
+        FOREIGN KEY("company_id") REFERENCES "companies"("id"),
+        FOREIGN KEY("company_supervisor_id") REFERENCES "company_supervisors"("id"),
+        FOREIGN KEY("university_coordinator_id") REFERENCES "university_coordinators"("id")
+    );
+
+    -- student_internships table
+    CREATE TABLE "student_internships" (
+        "student_id" INTEGER,
+        "internship_id" INTEGER,
+        PRIMARY KEY("student_id", "internship_id"),
+        FOREIGN KEY("student_id") REFERENCES "students"("id"),
+        FOREIGN KEY("internship_id") REFERENCES "internships"("id")
+    );
+
+    -- teacher_internships table
+    CREATE TABLE "teacher_internships" (
+        "teacher_id" INTEGER,
+        "internship_id" INTEGER,
+        PRIMARY KEY("teacher_id", "internship_id"),
+        FOREIGN KEY("teacher_id") REFERENCES "teachers"("id"),
+        FOREIGN KEY("internship_id") REFERENCES "internships"("id")
+    );
+
+    -- grades table
+    CREATE TABLE "grades" (
+        "id" INTEGER PRIMARY KEY,
+        "title" TEXT NOT NULL,
+        "type" TEXT NOT NULL CHECK("type" IN ('assignment', 'quiz', 'final_exam')),
+        "student_id" INTEGER NOT NULL,
+        "student_grade" INTEGER NOT NULL CHECK("student_grade" >= 0),
+        "total_grade" INTEGER NOT NULL CHECK("total_grade" >= "student_grade" AND "total_grade" > 0),
+        "internship_id" INTEGER NOT NULL,
+        "teacher_id" INTEGER NOT NULL,
+        FOREIGN KEY("student_id") REFERENCES "students"("id"),
+        FOREIGN KEY("internship_id") REFERENCES "internships"("id"),
+        FOREIGN KEY("teacher_id") REFERENCES "teachers"("id")
+    );
