@@ -1,0 +1,109 @@
+Table students {
+    id INTEGER [primary key]
+    first_name TEXT
+    last_name TEXT
+    phone_number TEXT
+    college TEXT
+    stage TEXT
+    university_id INTEGER
+}
+
+Table teachers {
+    id INTEGER [primary key]
+    first_name TEXT
+    last_name TEXT
+    national_id TEXT
+    phone_number TEXT
+    email TEXT
+    general_specialization TEXT
+    fine_specialization TEXT
+    birth_date DATE
+}
+
+Table companies {
+    id INTEGER [primary key]
+    title TEXT
+    specialization TEXT
+    email TEXT
+    location TEXT
+}
+
+Table company_supervisors {
+    id INTEGER [primary key]
+    first_name TEXT
+    last_name TEXT
+    company_id INTEGER
+    national_id TEXT
+    phone_number TEXT
+    email TEXT
+    department TEXT
+    role_title TEXT
+    birth_date DATE
+}
+
+Table university_coordinators {
+    id INTEGER [primary key]
+    first_name TEXT
+    last_name TEXT
+    national_id TEXT
+    phone_number TEXT
+    email TEXT
+    department TEXT
+    coordinator_role TEXT
+    birth_date DATE
+}
+
+Table internships {
+    id INTEGER [primary key]
+    title TEXT
+    type TEXT
+    company_id INTEGER
+    company_supervisor_id INTEGER
+    university_coordinator_id INTEGER
+    start_date DATE
+    total_hours INTEGER
+    location TEXT
+}
+
+Table student_internships {
+    student_id INTEGER
+    internship_id INTEGER
+}
+
+Table teacher_internships {
+    teacher_id INTEGER
+    internship_id INTEGER
+}
+
+Table grades {
+    id INTEGER [primary key]
+    title TEXT
+    type enum('assignment', 'quiz', 'final_exam')
+    student_id INTEGER
+    student_grade INTEGER
+    total_grade INTEGER
+    internship_id INTEGER
+    teacher_id INTEGER
+}
+
+Ref: "internships"."id" < "student_internships"."internship_id"
+
+Ref: "students"."id" < "student_internships"."student_id"
+
+Ref: "teachers"."id" < "teacher_internships"."teacher_id"
+
+Ref: "teacher_internships"."internship_id" < "internships"."id"
+
+Ref: "university_coordinators"."id" < "internships"."university_coordinator_id"
+
+Ref: "company_supervisors"."id" < "internships"."company_supervisor_id"
+
+Ref: "companies"."id" < "internships"."company_id"
+
+Ref: "companies"."id" < "company_supervisors"."company_id"
+
+Ref: "grades"."teacher_id" < "teachers"."id"
+
+Ref: "grades"."student_id" < "students"."id"
+
+Ref: "internships"."id" < "grades"."internship_id"
