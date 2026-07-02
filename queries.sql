@@ -109,9 +109,35 @@ FROM "companies";
 -- =========================
 
 -- Calculate a student's average grade
+SELECT "students"."id", "students"."first_name", "students"."last_name",
+       ROUND(AVG("grades"."student_grade"), 2) AS "Average student grade",
+       ROUND(AVG("grades"."total_grade"), 2) AS "Average total grade",
+       ROUND(AVG("grades"."student_grade") / AVG("grades"."total_grade") * 100,2) AS "%"
+FROM "students"
+JOIN "grades" ON "grades"."student_id" = "students"."id"
+GROUP BY "grades"."student_id";
+
 
 -- Show the top students in an internship
+SELECT "students"."id", "students"."first_name", "students"."last_name",
+       ROUND(AVG("grades"."student_grade"), 2) AS "Average student grade",
+       ROUND(AVG("grades"."total_grade"), 2) AS "Average total grade",
+       ROUND(AVG("grades"."student_grade") / AVG("grades"."total_grade") * 100,2) AS "%"
+FROM "students"
+JOIN "grades" ON "grades"."student_id" = "students"."id"
+WHERE "grades"."internship_id" = 1
+GROUP BY "grades"."student_id"
+ORDER BY "%" DESC
+LIMIT 10;
 
 -- Count students in each internship
+SELECT "internships"."id", "internships"."title", COUNT("student_internships"."student_id") AS "Number of students" 
+FROM "internships"
+JOIN "student_internships" ON "student_internships"."internship_id" = "internships"."id"
+GROUP BY "student_internships"."internship_id";
 
 -- Count internships offered by each company
+SELECT "companies"."id", "companies"."title", COUNT("internships"."company_id") AS "number of internship"
+FROM "companies"
+JOIN "internships" ON "internships"."company_id" = "companies"."id"
+GROUP BY "internships"."company_id";
