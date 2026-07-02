@@ -37,7 +37,15 @@ WHERE "student_internships"."student_id" = 1
 ORDER BY "internships"."start_date" DESC;
 
 -- View all grades for a student
-
+SELECT "grades"."id", "grades"."title", 
+       "grades"."type", "grades"."student_grade", 
+       "grades"."total_grade", "internships"."title" AS "internship",
+       "teachers"."first_name" || ' ' || "teachers"."last_name" AS "teacher"
+FROM "grades"
+JOIN "internships" ON "internships"."id" = "grades"."internship_id"
+JOIN "teachers" ON "teachers"."id" = "grades"."teacher_id"  
+WHERE "grades"."student_id" = 1
+ORDER BY "grades"."id" DESC;
 
 -- =========================
 -- Companies
