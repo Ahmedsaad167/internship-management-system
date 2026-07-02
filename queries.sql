@@ -52,21 +52,35 @@ ORDER BY "grades"."id" DESC;
 -- =========================
 
 -- Add a new internship
+INSERT INTO "internships" ("title", "type", "location", "company_id", "company_supervisor_id", "university_coordinator_id", "start_date", "total_hours")
+VALUES ('Introduction in AI', 'summer', 'Remote', 1, 1, 3, '2026-07-06', 120);
 
 -- View students registered in an internship
-
--- Assign a company supervisor to an internship
-
+SELECT * FROM "students"
+WHERE "id" IN (
+    SELECT "student_id" FROM "student_internships"
+    WHERE "internship_id" = 1
+);
 
 -- =========================
 -- Teachers
 -- =========================
 
--- View students in an internship
+-- View students in an  #2 internship
+SELECT "id", "first_name" || ' ' || "last_name" AS "name", "phone_number", "college", "stage", "university_id"
+FROM "students"
+WHERE "id" IN (
+    SELECT "student_id" FROM "student_internships"
+    WHERE "internship_id" = 2
+);
 
 -- Add a grade
+INSERT INTO "grades" ("title", "type", "student_id", "student_grade", "total_grade", "internship_id", "teacher_id")
+VALUES ('Quiz 2', 'quiz', 6, 8, 10, 2, 6);
 
 -- Update a student's grade
+UPDATE "grades" SET "student_grade" = 9 
+WHERE "id" = 7;
 
 
 -- =========================
